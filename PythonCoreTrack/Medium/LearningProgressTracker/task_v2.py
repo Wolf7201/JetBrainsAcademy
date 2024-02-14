@@ -1,12 +1,17 @@
+"""Трекер образования студентов."""
+
 import re
 
 
 class DataIsNotValid(Exception):
-    pass
+    """Ошибка валидации данных."""
 
 
 class EmailIsTaken(Exception):
-    pass
+    """
+    Ошибка, когда пользователь с данным
+    email уже зарегистрирован.
+    """
 
 
 class Student:
@@ -45,11 +50,11 @@ class Student:
 
         if not self._is_valid_first_name():
             raise DataIsNotValid("Incorrect first name")
-        elif not self._is_valid_last_name():
+        if not self._is_valid_last_name():
             raise DataIsNotValid("Incorrect last name")
-        elif not self._is_valid_email():
+        if not self._is_valid_email():
             raise DataIsNotValid("Incorrect email")
-        elif self.email in self.emails:
+        if self.email in self.emails:
             raise EmailIsTaken("This email is already taken.")
 
         self.points = {name: 0 for name in self.courses}
@@ -89,8 +94,7 @@ class Student:
         input_list = input_string.split()
         if self._is_valid_points(input_list):
             points = list(map(int, input_list))
-            for i in range(len(courses_list)):
-                course = courses_list[i]
+            for i, course in enumerate(courses_list):
                 # Добавляем баллы пользователю.
                 self.points[course] += points[i]
                 # Отправляем данные в курс.
@@ -109,16 +113,15 @@ class Student:
     @staticmethod
     def get_students_id() -> str:
         """Отдает в консоль список id студентов."""
-        if Student.students:
-            answer = "Students:\n"
-            for key in Student.students.keys():
-                answer += f'{key}\n'
-            return answer.rstrip()
-        else:
+        if not Student.students:
             return "No students found"
+        # Создаем список строк, каждая из которых содержит ID студента.
+        students_ids = [str(key) for key in Student.students]
+        return "Students:\n" + "\n".join(students_ids)
 
 
 class Course:
+    """Класс для работы с курсами."""
     courses = {}
 
     def __init__(self, name: str, passing_scores: int) -> None:
@@ -317,7 +320,7 @@ class LearningProgressTracker:
                 print(f"Total {student_count} students have been added.")
                 break
 
-            elif space_count >= 2:
+            if space_count >= 2:
                 # Используем rsplit для разделения с конца строки email.
                 parts = data.rsplit(' ', 1)
                 full_name = parts[0]
@@ -372,7 +375,7 @@ class LearningProgressTracker:
             str_input = input()
             if str_input == "back":
                 break
-            elif str_input.isdigit() and Student.students.get(int(str_input)):
+            if str_input.isdigit() and Student.students.get(int(str_input)):
                 student = Student.students.get(int(str_input))
                 print(student.get_student_score())
             else:
@@ -397,7 +400,7 @@ class LearningProgressTracker:
             if str_input == "back":
                 break
             # Проверка наличие команды в нижнем регистре в словаре.
-            elif str_input.lower() in courses_lower:
+            if str_input.lower() in courses_lower:
                 course = str_input.lower()
                 print(courses_lower[course].get_top_students())
             else:
@@ -425,6 +428,9 @@ class LearningProgressTracker:
 
 
 def main():
+    """
+    Запуск логики программы.
+    """
     courses_points = {
         "Python": 600,
         "DSA": 400,
